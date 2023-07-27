@@ -5,7 +5,7 @@ File input/output operations.
 
 import { promises as fs } from 'fs';
 import * as fs_s from 'fs';
-import { formatBytes } from './util.ts';
+import { formatBytes } from './util';
 
 const getBytes = (data:string):number =>  Number(new TextEncoder().encode(data).length);
 

@@ -1,17 +1,83 @@
 {
   "compilerOptions": {
-    "outDir": "out",
-    "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "Node",
-    "strict": true,
-    "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "emitDeclarationOnly" : true,
-    "noEmit": false
-  },
-  "include": ["src"]
+   "moduleResolution": "node",
+   "target": "ES2022",
+   "module": "ES2022",
+   "lib": ["ES2022","dom"],
+   "declaration": true,
+   "noImplicitAny": true,
+   "removeComments": true,
+   "esModuleInterop": true,
+   "allowSyntheticDefaultImports": true,
+  //  "allowImportingTsExtensions": true,
+  //  "noEmit": true,
+   "baseUrl": "./",
+    "types": [
+      "node"],
+   "rootDir": "./src",
+   "outDir": "./out",
+},
+  "include": [
+    "./src/**/*.ts"
+  ]
 }
+
+// {
+//   "compilerOptions": {
+//     "target": "es5",
+//     "lib": [
+//       "dom",
+//       "dom.iterable",
+//       "esnext"
+//     ],
+//     "allowJs": true,
+//     "skipLibCheck": true,
+//     "esModuleInterop": true,
+//     "allowSyntheticDefaultImports": true,
+//     "strict": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "module": "esnext",
+//     "moduleResolution": "node",
+//     "resolveJsonModule": true,
+//     "isolatedModules": true,
+//     "noEmit": true,
+//     "typeRoots": [
+//       "node_modules/@types",
+//       "src/types"
+//     ],
+//     "jsx": "react-jsx"
+//   },
+//   "include": [
+//     "src"
+//   ]
+//   // "compilerOptions": {
+//   //   "target": "ES2020",
+//   //   "module": "ES6",
+//   //   "rootDir": "./src",
+//   //   "moduleResolution": "node",
+//   //   "outDir": "./out",
+//   //   "esModuleInterop": true,
+//   //   "forceConsistentCasingInFileNames": true,
+//   //   "skipLibCheck": true,
+//   //   "allowImportingTsExtensions": true,
+//   //   "noEmit": true
+//   // },
+
+//   // "compilerOptions": {
+//   //   "baseUrl": ".",
+//   //   "outDir": "out",
+//   //   "target": "ES2020",
+//   //   "module": "NodeNext",
+//   //   // "moduleResolution": "Node",
+//   //   // "strict": true,
+//   //   // "resolveJsonModule": true,
+//   //   "allowImportingTsExtensions": true,
+//   //   // "isolatedModules": true,
+//   //   // "esModuleInterop": true,
+//   //   // "declaration": true,
+//   //   // "emitDeclarationOnly" : true,
+//   //   "noEmit": true
+//   // },
+//   // "include": ["src"]
+// }
