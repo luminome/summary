@@ -1,6 +1,12 @@
-import { read, write } from './file-io';
-import { keyGen } from './util';
-import madge from 'madge';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.summary = void 0;
+const file_io_1 = require("./file-io");
+const util_1 = require("./util");
+const madge_1 = __importDefault(require("madge"));
 const textual_marker = '--functional-summary';
 const flattened = new Map();
 const check = (path) => {
@@ -23,7 +29,7 @@ const filter = (src) => {
 };
 const read_summary = async (path) => {
     const map_el = flattened.get(path);
-    const raw_read = await read(path);
+    const raw_read = await (0, file_io_1.read)(path);
     console.log(raw_read.message, raw_read.bytes_read, raw_read.num_lines);
     if (raw_read.payload) {
         const has_summary = raw_read.payload.indexOf(`//${textual_marker}`);
@@ -36,8 +42,8 @@ const read_summary = async (path) => {
     }
     return map_el.summary;
 };
-export const summary = (path, save_json) => {
-    madge(path, { fileExtensions: ['ts', 'js'] }).then((res) => {
+const summary = (path, save_json) => {
+    (0, madge_1.default)(path, { fileExtensions: ['ts', 'js'] }).then((res) => {
         console.log(res);
         filter(res.obj());
         const results = [];
@@ -52,13 +58,14 @@ export const summary = (path, save_json) => {
                 map_el.summary = summary.split('\n');
             });
             console.log([...flattened]);
-            save_json && write(save_json, JSON.stringify([...flattened.values()], null, 2));
+            save_json && (0, file_io_1.write)(save_json, JSON.stringify([...flattened.values()], null, 2));
         });
         return true;
     }).finally((r) => console.log('sync part done', r));
     return { result: null };
 };
-export default (path, dom_obj, save_json = '') => {
-    console.log(keyGen(), path, dom_obj, __filename);
-    path && summary(path, save_json);
+exports.summary = summary;
+exports.default = (path, dom_obj, save_json = '') => {
+    console.log((0, util_1.keyGen)(), path, dom_obj, __filename);
+    path && (0, exports.summary)(path, save_json);
 };
