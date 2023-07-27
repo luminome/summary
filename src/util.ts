@@ -1,12 +1,13 @@
 export function formatMs(ms:number, decimals:number = 3): string {
     if (!+ms) return '0 ms';
     const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['ms', 's', 'm', 'h'];
-    const scales = [1, 1000, 60000, 3600000];
+    const sizes = ['ms', 'secs', 'mins', 'hrs', 'days'];
+    const scales = [1, 1000, 60000, 3600000, 86400000];
     let i = 0;
     if(ms >= 1000) i = 1;
     if(ms >= 60000) i = 2;
     if(ms >= 3600000) i = 3;
+    if(ms >= 86400000) i = 4;
     return `${i === 0 ? ms : (ms/scales[i]).toFixed(dm)} ${sizes[i]}`;
 }
 
@@ -25,9 +26,29 @@ export function keyGen(len:number = 6): string {
     return (Math.random() + 1).toString(36).substring(2,2+len).toUpperCase();
 }
 
-  
-//exports.ref = 'hello';
+export type timer_model = {
+    var_name: string,
+    T1: number;
+    T2: number;
+    start: Function;
+    stop: Function;
+};
 
-// export const keyGen = () => (Math.random() + 1).toString(36).substring(2,6).toUpperCase();
-
-// export default keyGen
+export const timer = (var_name:string):timer_model => {
+    function start(){
+        T.T1 = Date.now();
+        return T;
+    }
+    function stop(){
+        T.T2 = Date.now() - T.T1;
+        return T.T2;
+    }
+    const T = {
+        var_name: var_name,
+        T1: 0.0,
+        T2: 0.0,
+        start,
+        stop,
+    }
+    return T
+}
