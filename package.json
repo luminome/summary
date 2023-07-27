@@ -1,0 +1,18 @@
+{
+  "name": "summary",
+  "version": "1.0.0",
+  "description": "Utility that uses madge to build a dependency tree.",
+  "main": "./src/index.ts",
+  "scripts": {
+    "default-test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_ENV=production ts-node test.ts"
+  },
+  "author": "SAC",
+  "license": "ISC",
+  "dependencies": {
+    "@types/madge": "^5.0.0",
+    "madge": "^6.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
