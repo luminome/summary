@@ -64,7 +64,7 @@ const read_summary = async (path:string): Promise<string> => {
 
 export const summary = async (path:string, save_json:string):Promise<object> => {
     
-    const products = await madge(path, {fileExtensions:['ts', 'js'], includeNpm:true}).then(res => {
+    const products = await madge(path, {fileExtensions:['ts','tsx','js','jsx'], includeNpm:true}).then(res => {
         filter(res.obj());
         const results:Promise<string>[] = [];
         for(let [path, _] of flattened) results.push(read_summary(path));
