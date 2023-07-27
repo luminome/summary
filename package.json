@@ -1,6 +1,7 @@
 {
   "name": "summary",
   "version": "1.0.0",
+  "type":"module",
   "description": "Utility that uses madge to build a dependency tree.",
   "main": "./src/index.ts",
   "scripts": {

@@ -96,7 +96,13 @@ export const summary = (path:string, save_json:string):object => {
 
 
 export default (path:string | null, dom_obj:HTMLDivElement | null, save_json:string = ''):void => {
-    path && summary(path, save_json);
     console.log(keyGen(), path, dom_obj, __filename);
+    
+    path && summary(path, save_json);
+
+
+
+
+    
 
 }
