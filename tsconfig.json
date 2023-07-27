@@ -15,7 +15,7 @@
     "types": [
       "node"],
    "rootDir": "./src",
-   "outDir": "./out",
+   "outDir": "./build",
 },
   "include": [
     "./src/**/*.ts"

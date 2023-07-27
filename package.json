@@ -2,7 +2,7 @@
   "name": "summary",
   "version": "1.0.0",
   "description": "Utility that uses madge to build a dependency tree.",
-  "main": "./src/",
+  "main": "./build/",
   "scripts": {
     "default-test": "echo \"Error: no test specified\" && exit 1",
     "test": "ts-node src/test.ts",
@@ -12,8 +12,10 @@
   "author": "SAC",
   "license": "ISC",
   "dependencies": {
+    "@types/fs-extra": "^11.0.1",
     "@types/madge": "^5.0.0",
     "@types/node": "^18.11.18",
+    "fs-extra": "^11.1.1",
     "madge": "^6.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"

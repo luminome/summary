@@ -4,6 +4,7 @@ File input/output operations.
 //--functional-summary
 
 import { promises as fs } from 'fs';
+import { ensureDirSync } from 'fs-extra';
 import * as fs_s from 'fs';
 import { formatBytes } from './util';
 
@@ -34,6 +35,11 @@ export type read_type = {
 };
 
 export const write = async (path:string, data:string): Promise<string>  => {
+
+    const pathname = path.replace(/^\.*\/|\/?[^\/]+\.[a-z]+|\/$/g, '');
+    console.log("pathname", pathname);
+    ensureDirSync(pathname);
+
     try {
         await fs.writeFile(path, data, { flag: 'w+' });
         return `file ${path} (${formatBytes(getBytes(data))}) was saved.`;
@@ -50,6 +56,6 @@ export const read = async(path:string): Promise<read_type> => {
         num_lines: await countFileLines(path), 
         payload:data.toString()};
     } catch (error) {
-        return {message:`file read failed (${error})`, bytes_read:0, num_lines:null, payload:null};
+        return {message:`file read failed (${error}) path:${path}`, bytes_read:0, num_lines:null, payload:null};
     }
 }
