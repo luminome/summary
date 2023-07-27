@@ -10,7 +10,7 @@ import madge from 'madge';
 
 const textual_marker = '--functional-summary';
 
-type dependency = {
+export type dependency = {
     path: string,
     uses: number,
     bytes: number,
