@@ -32,12 +32,13 @@ export type read_type = {
     bytes_read: number;
     num_lines: number | any;
     payload: string | null;
+    stat: Date | null;
 };
 
 export const write = async (path:string, data:string): Promise<string>  => {
 
     const pathname = path.replace(/^\.*\/|\/?[^\/]+\.[a-z]+|\/$/g, '');
-    console.log("pathname", pathname);
+    // console.log("pathname", pathname);
     ensureDirSync(pathname);
 
     try {
@@ -54,8 +55,9 @@ export const read = async(path:string): Promise<read_type> => {
         return {message:`read ${path} (${formatBytes(getBytes(data.toString()))}).`, 
         bytes_read:getBytes(data.toString()), 
         num_lines: await countFileLines(path), 
-        payload:data.toString()};
+        payload:data.toString(),
+        stat:(await fs.stat(path)).mtime};
     } catch (error) {
-        return {message:`file read failed (${error}) path:${path}`, bytes_read:0, num_lines:null, payload:null};
+        return {message:`file read failed (${error}) path:${path}`, bytes_read:0, num_lines:null, payload:null, stat:null};
     }
 }

@@ -1,7 +1,7 @@
 /*
-THIS is the SUMMARY MODULE (npm link);
+THIS is the SUMMARY MODULE (it lives at github.);
 Generator to find all comment summaries with prefix set by 'textual_marker';
-It's a pretty remarkable little tool the uses the madge library.
+It's a pretty remarkable little tool that uses the madge library.
 */
 //--functional-summary
 import { read, write } from './file-io';
@@ -15,6 +15,7 @@ type dependency = {
     uses: number,
     bytes: number,
     lines: number,
+    last_mod: number,
     summary: string | string[]
 }
 
@@ -24,7 +25,7 @@ const flattened = new Map();
 const check = (path:string):void => {
     const in_map = flattened.get(path);
     if(in_map === undefined){
-        const k:dependency = {path:path, uses:1, bytes:0, lines:0, summary: 'blank'};
+        const k:dependency = {path:path, uses:1, bytes:0, lines:0, last_mod:0, summary: 'blank'};
         flattened.set(path, k);
     }else{
         in_map.uses ++;
@@ -50,6 +51,7 @@ const read_summary = async (path:string): Promise<string> => {
 
         map_el.bytes = !map_el.bytes ? raw_read.bytes_read : 0;
         map_el.lines = !map_el.lines ? raw_read.num_lines+1 : 1;
+        map_el.last_mod = !map_el.last_mod ? raw_read.stat : null;
 
         if(has_summary !== -1){
             let text:string = raw_read.payload.slice(0,has_summary);
@@ -60,10 +62,9 @@ const read_summary = async (path:string): Promise<string> => {
     return map_el.summary;
 }
 
-export const summary = (path:string, save_json:string):object => {
-    madge(path, {fileExtensions:['ts', 'js']}).then((res) => {
-        console.log(res);
-        
+export const summary = async (path:string, save_json:string):Promise<object> => {
+    
+    const products = await madge(path, {fileExtensions:['ts', 'js'], includeNpm:true}).then(res => {
         filter(res.obj());
         const results:Promise<string>[] = [];
         for(let [path, _] of flattened) results.push(read_summary(path));
@@ -77,31 +78,26 @@ export const summary = (path:string, save_json:string):object => {
                 summary = summary.replace('\n*/\n','');
                 map_el.summary = summary.split('\n');
             });
-            console.log([...flattened]);
+            // console.log([...flattened]);
             // console.log([...flattened.values()]);
             save_json && write(
                 save_json, 
                 JSON.stringify([...flattened.values()], null, 2)
             );
+            console.log('async part done');
         });
         
-        return true;
+        return {node_map:flattened, node_structure:{obj:res.obj(), warnings:res.warnings()}};
+
     }).finally((r:void) => console.log('sync part done', r));
 
-    return {result:null};
+    return products;
 }
         
 
 
 
-export default (path:string | null, dom_obj:HTMLDivElement | null, save_json:string = ''):void => {
+export default async (path:string | null, dom_obj:HTMLDivElement | null, save_json:string = ''):Promise<object> => {
     console.log(keyGen(), path, dom_obj, __filename);
-
-    path && summary(path, save_json);
-
-
-
-
-    
-
+    return path && summary(path, save_json);
 }
