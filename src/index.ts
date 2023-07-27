@@ -4,7 +4,6 @@ Generator to find all comment summaries with prefix set by 'textual_marker';
 It's a pretty remarkable little tool the uses the madge library.
 */
 //--functional-summary
-
 import { read, write } from './file-io.ts';
 import { keyGen } from './util.ts';
 import madge from 'madge';
@@ -97,7 +96,7 @@ export const summary = (path:string, save_json:string):object => {
 
 export default (path:string | null, dom_obj:HTMLDivElement | null, save_json:string = ''):void => {
     console.log(keyGen(), path, dom_obj, __filename);
-    
+
     path && summary(path, save_json);
 
 
