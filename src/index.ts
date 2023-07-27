@@ -87,7 +87,7 @@ export const summary = async (path:string, save_json:string):Promise<object> => 
             console.log('async part done');
         });
         
-        return {node_map:flattened, node_structure:{obj:res.obj(), warnings:res.warnings()}};
+        return {node_map: Object.fromEntries(flattened.entries()), node_structure:{obj:res.obj(), warnings:res.warnings()}};
 
     }).finally((r:void) => console.log('sync part done', r));
 
