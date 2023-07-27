@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
+    "outDir": "out",
     "target": "ES2020",
     "module": "NodeNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "noEmit": true,
-    "outDir": "out"
+    "declaration": true,
+    "emitDeclarationOnly" : true,
+    "noEmit": false
   },
   "include": ["src"]
 }
