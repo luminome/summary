@@ -1,5 +1,5 @@
 import nu_summary from "./index";
-console.log('testing',__filename);
+console.log('testing...');//,__filename);
 import dependencyTree from 'dependency-tree';
 import fs from 'fs';
 import precinct from 'precinct';
@@ -41,12 +41,12 @@ const no_ex:string[] = [];
 
 // console.log(summary_data_store.loaded);
 
-export const run_test = (path:string) => {
+export const run_test = (path:string, dirPath:string) => {
 
 
     const list = dependencyTree({
         filename: path,
-        directory: __dirname,
+        directory: dirPath,
         tsConfig: "./tsconfig.json",
         nonExistent: no_ex,
         // nodeModulesConfig: {
