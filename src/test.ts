@@ -107,7 +107,7 @@ const create_dependency = (path:string, from_path:string = '', mixin:string[] = 
 
 export const run_test = async (base_path:string, dirPath:string, configs:object = {}) => {
     Object.assign(config, configs);
-        
+
     walk.sync(base_path, (path, _) => {
         const omit = config.omit.filter(o => path.includes(o));
         const accept = config.exts.filter(o => path.includes(o));
@@ -133,8 +133,11 @@ export const run_test = async (base_path:string, dirPath:string, configs:object 
 
     const pref = [...rm.entries()].map(m => traverse_node(m[0], m[1]));
     await Promise.all(pref);
-    const pref_sort = [...rm.entries()].sort(compare);
-    return pref_sort;
+    const sledge:any = {};
+    const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
+        sledge[v[0] as keyof any] = v[1];
+    });
+    return sledge;
 }
 
 run_test('./', null);
