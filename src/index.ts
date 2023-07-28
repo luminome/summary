@@ -6,9 +6,57 @@ It's a pretty remarkable little tool that uses the madge library.
 //--functional-summary
 import { read, write } from './file-io';
 import { keyGen } from './util';
-import madge from 'madge';
+import madge, { MadgeConfig } from 'madge';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const textual_marker = '--functional-summary';
+
+// const madge_config = fs_s.readFile('./.madgerc', 'utf8', (err, data) => {
+//   if (err) throw new Error(err.message);
+//   return JSON.parse(data);
+// })
+
+const no_ex:string[] = [];
+// const madge_config:MadgeConfig = {
+//     fileExtensions: ["ts", "js"], 
+//     includeNpm: true,
+//     // tsConfig: "./tsconfig.json",
+//     // detectiveOptions: {
+//     //     ts:{
+//     //         mixedImports: true,
+//     //         includeCore: true,
+//     //         skipTypeImports: true
+//     //     },
+//     //     js:{
+//     //         includeCore: true,
+//     //     }
+//     //     // includeCore: true,
+//     //     // tsConfig: "./tsconfig.json",
+//     //     // // "mixedImports": true,
+//     //     // // "includeCore": true,
+//     //     // // "nodeModulesConfig": {
+//     //     // //     "entry": "module"
+//     //     // // }, // optional
+//     //     // nonExistent: no_ex,
+// 	// },
+
+// }
+
+const madge_config:MadgeConfig = {
+    "includeNpm": true,
+    "detectiveOptions": {
+        "ts": {
+            "skipTypeImports": false
+        }
+    },
+    "baseDir": "./",
+    "fileExtensions": [
+        "ts", "js"
+    ],
+    "tsConfig": "./tsconfig.json"
+}
 
 export type dependency = {
     path: string,
@@ -63,8 +111,14 @@ const read_summary = async (path:string): Promise<string> => {
 }
 
 export const summary = async (path:string, save_json:string):Promise<object> => {
+
+    console.log(madge_config);
     
-    const products = await madge(path, {fileExtensions:['ts','tsx','js','jsx',''], includeNpm:true}).then(res => {
+
+    const products = await madge(path, madge_config).then(res => {
+        console.log('dep', res.depends('src/file-io.ts'));
+
+
         filter(res.obj());
         const results:Promise<string>[] = [];
         for(let [path, _] of flattened) results.push(read_summary(path));

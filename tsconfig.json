@@ -19,7 +19,7 @@
 },
   "include": [
     "./src/**/*.ts"
-  ]
+, "precinct.d.ts"  ]
 }
 
 // {
