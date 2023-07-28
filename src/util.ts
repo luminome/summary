@@ -1,3 +1,7 @@
+/**
+* utility ƒ
+* //summary
+*/
 export function formatMs(ms:number, decimals:number = 3): string {
     if (!+ms) return '0 ms';
     const dm = decimals < 0 ? 0 : decimals

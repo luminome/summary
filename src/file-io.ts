@@ -1,7 +1,9 @@
-/*
-File input/output operations.
+/**
+* want to have it in d.ts
+* FILE-IO native
+* //summary
 */
-//--functional-summary
+
 
 import { promises as fs } from 'fs';
 import { ensureDirSync } from 'fs-extra';
@@ -10,7 +12,7 @@ import { formatBytes } from './util';
 
 const getBytes = (data:string):number =>  Number(new TextEncoder().encode(data).length);
 
-function countFileLines(filePath:string){
+export function countFileLines(filePath:string){
     return new Promise((resolve, reject) => {
     let lineCount = 0;
     fs_s.createReadStream(filePath)

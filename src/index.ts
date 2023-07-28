@@ -1,9 +1,10 @@
-/*
-THIS is the SUMMARY MODULE (it lives at github.);
-Generator to find all comment summaries with prefix set by 'textual_marker';
-It's a pretty remarkable little tool that uses the madge library.
+/**
+* THIS is the SUMMARY MODULE (it lives at github.);
+* Generator to find all comment summaries with prefix set by 'textual_marker';
+* It's a pretty remarkable little tool that uses the madge library.
+* //summary
 */
-//--functional-summary
+
 import { read, write } from './file-io';
 import { keyGen } from './util';
 import madge, { MadgeConfig } from 'madge';
@@ -11,12 +12,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const textual_marker = '--functional-summary';
-
-// const madge_config = fs_s.readFile('./.madgerc', 'utf8', (err, data) => {
-//   if (err) throw new Error(err.message);
-//   return JSON.parse(data);
-// })
+const textual_marker = '--summary';
 
 const no_ex:string[] = [];
 // const madge_config:MadgeConfig = {
@@ -155,3 +151,8 @@ export default async (path:string | null, dom_obj:HTMLDivElement | null, save_js
     console.log(keyGen(), path, dom_obj, __filename);
     return path && summary(path, save_json);
 }
+
+/**
+* LOT OF WORK TO DO HERE.
+* //summary
+*/
