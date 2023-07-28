@@ -2,7 +2,8 @@ import nu_summary from "./index";
 console.log('testing...');//,__filename);
 import dependencyTree from 'dependency-tree';
 import fs from 'fs';
-import precinct from 'precinct';
+import path from 'path';
+import walk from 'walkdir';
 
 // const content = fs.readFileSync('./src/index.ts', 'utf8');
 
@@ -40,20 +41,61 @@ const no_ex:string[] = [];
 // summary();
 
 // console.log(summary_data_store.loaded);
+// var walk = require('walkdir');
 
-export const run_test = (path:string, dirPath:string) => {
+// async with path callback
+
+// const base_path = './src';
 
 
-    const list = dependencyTree({
-        filename: path,
-        directory: dirPath,
-        tsConfig: "./tsconfig.json",
-        nonExistent: no_ex,
-        // nodeModulesConfig: {
-        //     entry: 'module'
-        // }, // optional
+
+// function walkDir(dir:string, callback:Function) {
+//     fs.readdirSync(dir).forEach( f => {
+//         let dirPath = path.join(dir, f);
+//         let isDirectory = fs.statSync(dirPath).isDirectory();
+//         isDirectory ? 
+//         walkDir(dirPath, callback) : callback(path.join(dir, f));
+//     });
+// };
+
+
+// walkDir('./', function(filePath:string) {
+//     // const fileContents = fs.readFileSync(filePath, 'utf8');
+//     console.log(filePath);//, fileContents);
+// });
+
+
+
+export const run_test = (base_path:string, dirPath:string) => {
+
+    walk(base_path, function(path, stat) {
+        console.log('found: ', path, stat);
+    
+        const list = dependencyTree({
+            filename: path,
+            directory: base_path,
+            tsConfig: "./tsconfig.json",
+            nonExistent: no_ex,
+            // nodeModulesConfig: {
+            //     entry: 'module'
+            // }, // optional
+        });
+    
+        console.log(list, no_ex);
     });
 
-    console.log(list, no_ex);
+    // const list = dependencyTree({
+    //     filename: path,
+    //     directory: dirPath,
+    //     tsConfig: "./tsconfig.json",
+    //     nonExistent: no_ex,
+    //     // nodeModulesConfig: {
+    //     //     entry: 'module'
+    //     // }, // optional
+    // });
+
+    // console.log(list, no_ex);
     
 }
+
+run_test('./src', null);
