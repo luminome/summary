@@ -139,7 +139,7 @@ export default async (base_path:string, dirPath:string, configs:object = {}) => 
     
     console.log(pref_sort);
 
-    return [{message: 'nothing', children: pref_sort}];
+    return [{message: ['nothing', 'tested'], children: pref_sort}];
 }
 
 // default('./', null);
