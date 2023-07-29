@@ -131,12 +131,14 @@ export default async (base_path:string, dirPath:string, configs:object = {}) => 
     const pref = [...rm.entries()].map(m => traverse_node(m[0], m[1]));
     await Promise.all(pref);
 
+    console.log(pref);
     // const sledge:any = {};
-    // const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
-    //     sledge[v[0] as keyof any] = v[1];
-    // });
-    
-    return pref;
+    const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
+        return {fs_node:v};
+        // sledge[v[0] as keyof any] = v[1];
+    });
+
+    return pref_sort;
 }
 
 // default('./', null);
