@@ -138,7 +138,7 @@ export default async (base_path:string, dirPath:string, configs:object = {}) => 
         // sledge[v[0] as keyof any] = v[1];
     });
 
-    return pref_sort;
+    return {children: pref_sort};
 }
 
 // default('./', null);
