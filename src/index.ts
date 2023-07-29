@@ -134,7 +134,7 @@ export default async (base_path:string, dirPath:string, configs:object = {}) => 
     console.log(pref);
     // const sledge:any = {};
     const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
-        return {fs_node:v};
+        return {fs_node:v[1]};
         // sledge[v[0] as keyof any] = v[1];
     });
 
