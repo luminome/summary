@@ -5,8 +5,7 @@
 * //summary
 */
 
-
-console.log('testing...',__filename);
+console.log('summary init...',__filename);
 
 import dependencyTree, { Tree, TreeInnerNode } from 'dependency-tree';
 import fs, { Stats } from 'fs';
@@ -133,6 +132,7 @@ export const run_test = async (base_path:string, dirPath:string, configs:object 
 
     const pref = [...rm.entries()].map(m => traverse_node(m[0], m[1]));
     await Promise.all(pref);
+
     const sledge:any = {};
     const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
         sledge[v[0] as keyof any] = v[1];
