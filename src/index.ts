@@ -31,7 +31,7 @@ export type dependency = {
     last_mod?: Date;
     validated?: boolean;
     npm?: dependency_npm | null;
-    summary?: string | string[] | null;
+    summary?: string[] | null;
 }
 
 const no_ex:string[] = [];
@@ -82,7 +82,7 @@ const traverse_node = async (path:string, obj:dependency) => {
             var m = data.match(/\/\*\*\s*\n([^\*]|\*[^\/])*\*\/\n/g);
             const summary = m && m.filter((e:string) => e.indexOf(config.summary_marker) !== -1)
                 .map((e:string) => e.replace(regex,'').split('\n').filter((e:string) => e.length > 0));
-            obj.summary = (summary as []);
+            obj.summary = summary as [];//(summary as []);
             obj.validated = true;
         }
     } catch (err) {
