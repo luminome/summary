@@ -184,7 +184,8 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
     rm.clear();
     
     const walk_opts = {
-        filter : filterFn
+        "follow_symlinks": true,
+        "filter" : filterFn
     }
 
 
