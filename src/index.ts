@@ -1,9 +1,9 @@
 /**
-* THIS is the SUMMARY MODULE (it lives at github.);
-* Generator to find all comment summaries with prefix set by 'textual_marker';
-* It's a pretty remarkable little tool that uses the madge library.
-* //summary
-*/
+ * THIS is the SUMMARY MODULE (it lives at github.);
+ * Generator to find all comment summaries with prefix set by 'textual_marker';
+ * Tool that no longer uses the madge library.
+ * //summary
+ */
 
 // console.log('summary init...',__filename);
 
@@ -74,7 +74,7 @@ const traverse_node = async (path:string, obj:dependency) => {
     
     // get summaries if they exist.
     // this is some terrible regex.
-    const regex = /\/\*\*\n|\*\s|\/\/.[a-z]+|\n\*\/\n/g;
+    const regex = /\/\*\*\n|\s\*\s|\*\s|\/\/.[a-z]+|\n\s\*\/|\n\*\//g;
 
     try {
         if(!obj.validated){
@@ -301,7 +301,13 @@ export {test as default};
 //     return path && summary(path, save_json);
 // }
 
-// /**
-// * LOT OF WORK TO DO HERE.
-// * //summary
-// */
+/**
+* This is the official version.
+* //summary
+*/
+
+/**
+ * This is the un-official version.
+ * //summary
+ */
+//text
