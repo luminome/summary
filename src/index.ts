@@ -5,10 +5,10 @@
 * //summary
 */
 
-console.log('summary init...',__filename);
+// console.log('summary init...',__filename);
 
-import dependencyTree, { Tree, TreeInnerNode } from 'dependency-tree';
-import fs, { Stats } from 'fs';
+import dependencyTree, { Tree } from 'dependency-tree';
+import fs from 'fs';
 import path from 'path';
 import walk from 'walkdir';
 import { countFileLines } from './file-io';
@@ -133,22 +133,20 @@ const test = async (base_path:string, dirPath:string, configs:object = {}) => {
     const pref = [...rm.entries()].map(m => traverse_node(m[0], m[1]));
     await Promise.all(pref);
 
-    console.log(pref);
+    // console.log(pref);
     // const sledge:any = {};
     const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
         return {fs_node:v[1]};
     });
     
-    console.log(pref_sort);
+    // console.log(pref_sort);
 
-    return [{message: ['nothing', 'tested'], children: pref_sort}];
+    return [{message: ['summary', pref_sort.length, 'tested'], children: pref_sort}];
 }
+
 
 export {test as default};
 
-
-// const res = test('/Users/sac/Projects/module/summary/src/util.ts', null);
-// console.log(res);
 
 // default('./', null);
 
