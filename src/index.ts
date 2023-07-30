@@ -102,9 +102,9 @@ const create_dependency = (path:string, from_path:string = '', mixin:string[] = 
     }
 }
 
-const test = async (base_path:string, configs:object = {}) => {
+const test = async (base_path:string, configs:object = {}):Promise<object> => {
     Object.assign(config, configs);
-
+    rm.clear();
     
 
     walk.sync(base_path, (path, _) => {
