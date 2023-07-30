@@ -7,7 +7,7 @@
 
 import summary from './index';
 
-summary('/Users/sac/Projects/module/summary/src', null).then((res) => console.log(JSON.stringify(res, null, 2)));
+summary('/Users/sac/Projects/module/summary/records').then((res) => console.log(JSON.stringify(res, null, 2)));
 
 
 // console.log('summary init...',__filename);

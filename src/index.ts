@@ -102,7 +102,7 @@ const create_dependency = (path:string, from_path:string = '', mixin:string[] = 
     }
 }
 
-const test = async (base_path:string, dirPath:string, configs:object = {}) => {
+const test = async (base_path:string, configs:object = {}) => {
     Object.assign(config, configs);
 
     
@@ -111,6 +111,8 @@ const test = async (base_path:string, dirPath:string, configs:object = {}) => {
         const omit = config.omit.filter(o => path.includes(o));
         const accept = config.exts.filter(o => path.includes(o));
         if(omit.length > 0 || accept.length === 0) return false;
+        
+        console.log(base_path, path);
 
         const list:Tree = dependencyTree({
             filename: path,
