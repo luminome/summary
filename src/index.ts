@@ -36,6 +36,8 @@ export type dependency = {
 
 const no_ex:string[] = [];
 const wkg_root = path.resolve('./');
+var base_path:string = null;
+
 const rm = new Map();
 
 const config = {
@@ -44,7 +46,8 @@ const config = {
     summary_marker: `//${'summary'}`,
 }
 
-const short_path = (p:string) => p.substring(path.resolve('./').length, p.length);
+const short_path = (p:string) => p.substring(base_path.length, p.length);
+
 const compare = (a:any, b:any) => {
     const d = b[1].deps.length - a[1].deps.length;
     const an = a[1].npm ? 1 : 0;
@@ -56,11 +59,21 @@ const compare = (a:any, b:any) => {
 const validate_npm_module = (obj:dependency) => {
     const ref = obj.path_rel.split('/');
     const name = ref[2].indexOf('@') === -1 ? ref[2] : `${ref[2]}/${ref[3]}`;
-    const package_path = `${wkg_root}/node_modules/${name}/package.json`;
+    const package_path = `${base_path}/node_modules/${name}/package.json`;
     const package_json = JSON.parse(fs.readFileSync(package_path, 'utf8'));
-    const npm_dep:dependency_npm = {path:`${wkg_root}/node_modules/${name}`, path_rel:name, version:package_json.version, package:package_json};
+    const npm_dep:dependency_npm = {path:`${base_path}/node_modules/${name}`, path_rel:name, version:package_json.version, package:package_json};
     obj.npm = npm_dep;
 }
+
+const getAppRootDirFromPath = (p:string) => {
+    let currentDir = p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '');
+    while(!fs.existsSync(path.join(currentDir, 'package.json'))) {
+        currentDir = path.join(currentDir, '..')
+    }
+    return currentDir
+}
+
+
 
 const traverse_node = async (path:string, obj:dependency) => {
     const plines = await countFileLines(path);
@@ -102,17 +115,23 @@ const create_dependency = (path:string, from_path:string = '', mixin:string[] = 
     }
 }
 
-const test = async (base_path:string, configs:object = {}):Promise<object> => {
+const run_summary = async (target_path:string, configs:object = {}):Promise<object> => {
+    /**
+     * now we must locate the enclosing project directory.
+     */
+
+    base_path = getAppRootDirFromPath(target_path);
+    console.log('\x1b[33m summary base_path: \x1b[0m', base_path);
     Object.assign(config, configs);
     rm.clear();
     
 
-    walk.sync(base_path, (path, _) => {
+    walk.sync(target_path, (path, _) => {
         const omit = config.omit.filter(o => path.includes(o));
         const accept = config.exts.filter(o => path.includes(o));
         if(omit.length > 0 || accept.length === 0) return false;
         
-        console.log(base_path, path);
+        // console.log(base_path, path);
 
         const list:Tree = dependencyTree({
             filename: path,
@@ -147,7 +166,7 @@ const test = async (base_path:string, configs:object = {}):Promise<object> => {
 }
 
 
-export {test as default};
+export {run_summary as default};
 
 
 // default('./', null);
