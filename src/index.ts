@@ -102,8 +102,10 @@ const create_dependency = (path:string, from_path:string = '', mixin:string[] = 
     }
 }
 
-export default async (base_path:string, dirPath:string, configs:object = {}) => {
+const test = async (base_path:string, dirPath:string, configs:object = {}) => {
     Object.assign(config, configs);
+
+    
 
     walk.sync(base_path, (path, _) => {
         const omit = config.omit.filter(o => path.includes(o));
@@ -141,6 +143,12 @@ export default async (base_path:string, dirPath:string, configs:object = {}) => 
 
     return [{message: ['nothing', 'tested'], children: pref_sort}];
 }
+
+export {test as default};
+
+
+// const res = test('/Users/sac/Projects/module/summary/src/util.ts', null);
+// console.log(res);
 
 // default('./', null);
 
