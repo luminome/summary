@@ -11,6 +11,9 @@ import dependencyTree, { Tree } from 'dependency-tree';
 import fs from 'fs';
 import path from 'path';
 import walk from 'walkdir';
+import { formatMs, timer, timer_model } from './util';
+
+import { colours } from './colors'
 import { countFileLines } from './file-io';
 
 export type dependency_npm = {
@@ -22,6 +25,7 @@ export type dependency_npm = {
 
 export type dependency = {
     path: string;
+    type?: string | null,
     path_rel?: string;
     deps?: string[];
     from?: string[];
@@ -34,6 +38,9 @@ export type dependency = {
     summary?: string[] | null;
 }
 
+const process_timer = timer('process_timer');
+process_timer.start();
+
 const no_ex:string[] = [];
 const wkg_root = path.resolve('./');
 var base_path:string = null;
@@ -41,7 +48,7 @@ var base_path:string = null;
 const rm = new Map();
 
 const config = {
-    omit: ['.vscode','.git','node_modules'],
+    omit: ['.','..','.vscode','.git','node_modules'],
     exts: ['.js','.ts','.json'],
     summary_marker: `//${'summary'}`,
 }
@@ -57,33 +64,55 @@ const compare = (a:any, b:any) => {
 
 
 const validate_npm_module = (obj:dependency) => {
-    const ref = obj.path_rel.split('/');
-    const name = ref[2].indexOf('@') === -1 ? ref[2] : `${ref[2]}/${ref[3]}`;
-    const package_path = `${base_path}/node_modules/${name}/package.json`;
-    const package_json = JSON.parse(fs.readFileSync(package_path, 'utf8'));
-    const npm_dep:dependency_npm = {path:`${base_path}/node_modules/${name}`, path_rel:name, version:package_json.version, package:package_json};
-    obj.npm = npm_dep;
+    const base_name = getAppRootDirFromPath(obj.path);
+    const package_path = path.join(base_name, 'package.json');
+    if(fs.existsSync(package_path)){
+        const package_json = JSON.parse(fs.readFileSync(package_path, 'utf8'));
+        const term = base_name.split('/').pop();
+        obj.npm = {path:base_name, path_rel:term, version:package_json.version, package:package_json};
+    }
 }
 
 const getAppRootDirFromPath = (p:string) => {
-    let currentDir = p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '');
+    //find enclosing with 'package.json';
+    const base = p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '');
+    let currentDir = base;
     while(!fs.existsSync(path.join(currentDir, 'package.json'))) {
-        currentDir = path.join(currentDir, '..')
+        currentDir = path.join(currentDir, '..');
+        if(currentDir === '/') return base;
     }
     return currentDir
 }
 
 
 
-const traverse_node = async (path:string, obj:dependency) => {
-    const plines = await countFileLines(path);
-    obj.lines = (plines as number);
-    const statsObj = fs.statSync(path);
+const traverse_node = async (dep_path:string, obj:dependency) => {
+
+    // console.log('dep_path', `${dep_path}`, obj);
+
+    var line_count:number = await countFileLines(dep_path);;
+
+    // try {
+    //     line_count = obj.type === 'directory' && await countFileLines(dep_path);
+    // } catch (err) {
+    //     console.log('dep_path', `${dep_path}`);
+    //     console.error(err);
+    // }
+
+    // console.log(line_count);
+    // return false;
+
+    obj.lines = line_count;
+    const statsObj = fs.statSync(dep_path);
     obj.bytes = statsObj.size;
     obj.last_mod = statsObj.mtime;
 
     // validate info for npm packages.
-    obj.path_rel?.length > 0 && obj.path_rel.indexOf('node_modules') !== -1 && validate_npm_module(obj);
+    // console.log(obj.path);
+    obj.path.indexOf('node_modules') !== -1 && validate_npm_module(obj);
+
+    
+    // obj.path_rel?.length > 0 && obj.path_rel.indexOf('node_modules') !== -1 && validate_npm_module(obj);
     
     // get summaries if they exist.
     // this is some terrible regex.
@@ -91,7 +120,7 @@ const traverse_node = async (path:string, obj:dependency) => {
 
     try {
         if(!obj.validated){
-            const data = fs.readFileSync(path, 'utf8');
+            const data = fs.readFileSync(dep_path, 'utf8');
             var m = data.match(/\/\*\*\s*\n([^\*]|\*[^\/])*\*\/\n/g);
             const summary = m && m.filter((e:string) => e.indexOf(config.summary_marker) !== -1)
                 .map((e:string) => e.replace(regex,'').split('\n').filter((e:string) => e.length > 0));
@@ -104,34 +133,64 @@ const traverse_node = async (path:string, obj:dependency) => {
 
 }
 
-const create_dependency = (path:string, from_path:string = '', mixin:string[] = []) => {
-    const obj = rm.get(path);
+const create_dependency = (dep_path:string, type:string, from_path:string = '', mixin:string[] = []):void => {
+
+    const obj = rm.get(dep_path);
+
     if(obj){
         obj.uses ++;
         from_path.length > 0 && obj.from.push(from_path);
     }else{
-        const dep:dependency = {path: path, path_rel: short_path(path), uses: 0, deps: mixin.length > 0 ? mixin : [], from: from_path.length > 0 ? [from_path] : []};
-        rm.set(path, dep);
+
+        const dep:dependency = {
+            path: dep_path,
+            type: type,
+            path_rel: short_path(dep_path),
+            uses: 0,
+            deps: mixin.length > 0 ? mixin : [],
+            from: from_path.length > 0 ? [from_path] : []
+        };
+
+        rm.set(dep_path, dep);
     }
 }
+
+var filterFn = function(directory:string, files:string[]){
+    // console.log('directory', directory, files);
+    return files.filter((name) => {
+        var test = !config.omit.includes(name);
+        const ext = name.split('.');
+        ext.length > 1 && (test = config.exts.includes('.'+ext.pop()))
+        return test;
+    });
+}
+
+const log = (msg:string) => `${colours.fg.magenta}${msg}${colours.reset}`;
 
 const run_summary = async (target_path:string, configs:object = {}):Promise<object> => {
     /**
      * now we must locate the enclosing project directory.
      */
+    process_timer.start();
+
 
     base_path = getAppRootDirFromPath(target_path);
-    console.log('\x1b[33m summary base_path: \x1b[0m', base_path);
+    console.log(log("Summary base_path"), base_path); 
+
+    // console.log('\x1b[44m\x1b[35mSummary base_path:\x1b[0m', base_path);
+
+
     Object.assign(config, configs);
     rm.clear();
     
+    const walk_opts = {
+        filter : filterFn
+    }
 
-    walk.sync(target_path, (path, _) => {
-        const omit = config.omit.filter(o => path.includes(o));
-        const accept = config.exts.filter(o => path.includes(o));
-        if(omit.length > 0 || accept.length === 0) return false;
-        
-        // console.log(base_path, path);
+
+    walk.sync(target_path, {filter : filterFn}, (path, stat) => {
+
+        if(!stat.isFile()) return;
 
         const list:Tree = dependencyTree({
             filename: path,
@@ -143,24 +202,29 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
 
         const krel = Object.entries(list).map((a) => {
             return Object.keys(a[1]).map((dep_path:string) => {
-                create_dependency(dep_path, path);
+                create_dependency(dep_path, 'file', path);
                 return dep_path;
             });
         });
 
-        create_dependency(path, '', krel[0]);
+        const node_type = stat.isFile() ? 'file' : 'directory';
+
+        create_dependency(path, node_type, '');
+
+
     });
+
+    console.log(log("Summary base_path walked.")); 
 
     const pref = [...rm.entries()].map(m => traverse_node(m[0], m[1]));
     await Promise.all(pref);
 
-    // console.log(pref);
-    // const sledge:any = {};
+    console.log(log(`Summary all nodes traversed. (${pref.length})items`)); 
     const pref_sort = [...rm.entries()].sort(compare).map((v:any) => {
         return {fs_node:v[1]};
     });
     
-    // console.log(pref_sort);
+    console.log(log(`${formatMs(process_timer.stop())} elapsed.`)); 
 
     return [{message: ['summary', pref_sort.length, 'tested'], children: pref_sort}];
 }

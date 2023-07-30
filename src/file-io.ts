@@ -12,7 +12,7 @@ import { formatBytes } from './util';
 
 const getBytes = (data:string):number =>  Number(new TextEncoder().encode(data).length);
 
-export function countFileLines(filePath:string){
+export function countFileLines(filePath:string):Promise<number>{
     return new Promise((resolve, reject) => {
     let lineCount = 0;
     fs_s.createReadStream(filePath)
