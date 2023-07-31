@@ -7,8 +7,8 @@
 
 import summary from './index';
 
-summary('/Users/sac/Sites/gandi-sac-wp/static/a', {default:true, exts: ['.js','.ts']} as object).then((res) => {
-    // console.log(JSON.stringify(res, null, 2));
+summary('/Users/sac/Projects/summary-env/src', {default:true, exts: ['.js','.ts']} as object).then((res) => {
+    console.log(JSON.stringify(res, null, 2));
 });
 
 

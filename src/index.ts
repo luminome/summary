@@ -64,22 +64,28 @@ const compare = (a:any, b:any) => {
 
 
 const validate_npm_module = (obj:dependency) => {
+    // console.log('validate_npm_module', obj.path);
+
     const base_name = getAppRootDirFromPath(obj.path);
     const package_path = path.join(base_name, 'package.json');
     if(fs.existsSync(package_path)){
         const package_json = JSON.parse(fs.readFileSync(package_path, 'utf8'));
         const term = base_name.split('/').pop();
-        obj.npm = {path:base_name, rel_path:term, version:package_json.version, package:package_json};
+        obj.npm = {path:base_name, rel_path:package_json.name, version:package_json.version, package:package_json};
     }
 }
 
 const getAppRootDirFromPath = (p:string) => {
     //find enclosing with 'package.json';
-    const statsObj = fs.statSync(p);
-    const base = statsObj.isFile() ? p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '') : p;
+    // const statsObj = fs.statSync(p);
+    const base = p;//statsObj.isFile() ? p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '') : p;
+
+    // console.log(log(base));
+
     let currentDir = base;
     while(!fs.existsSync(path.join(currentDir, 'package.json'))) {
         currentDir = path.join(currentDir, '..');
+        // console.log(currentDir);
         if(currentDir === '/') return base;
     }
     return currentDir
