@@ -180,11 +180,14 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
      * now we must locate the enclosing project directory.
      */
     process_timer.start();
+    Object.assign(config, configs);
 
     base_path = getAppRootDirFromPath(target_path);
     console.log(log("Summary base_path"), base_path); 
+    console.log(log("Config"), config); 
 
-    Object.assign(config, configs);
+    
+
     rm.clear();
     
     const walk_opts = {
@@ -193,7 +196,7 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
     }
 
 
-    walk.sync(target_path, {filter : filterFn}, (path, stat) => {
+    walk.sync(target_path, walk_opts, (path, stat) => {
 
         if(!stat.isFile()) return;
 
