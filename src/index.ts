@@ -75,8 +75,8 @@ const validate_npm_module = (obj:dependency) => {
 
 const getAppRootDirFromPath = (p:string) => {
     //find enclosing with 'package.json';
-    // p.indexOf('.') !== -1 && 
-    const base = p.indexOf('.') !== -1 ? p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '') : p;
+    const statsObj = fs.statSync(p);
+    const base = statsObj.isFile() ? p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '') : p;
     let currentDir = base;
     while(!fs.existsSync(path.join(currentDir, 'package.json'))) {
         currentDir = path.join(currentDir, '..');
