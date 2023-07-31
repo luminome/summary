@@ -18,7 +18,7 @@ import { countFileLines } from './file-io';
 
 export type dependency_npm = {
     path: string;
-    path_rel?: string;
+    rel_path?: string;
     version?: string;
     package?: object | null;
 }
@@ -26,11 +26,11 @@ export type dependency_npm = {
 export type dependency = {
     path: string;
     type?: string | null,
-    path_rel?: string;
+    rel_path?: string;
     deps?: string[];
     from?: string[];
     uses?: number;
-    bytes?: number;
+    size?: number;
     lines?: number;
     last_mod?: Date;
     validated?: boolean;
@@ -69,7 +69,7 @@ const validate_npm_module = (obj:dependency) => {
     if(fs.existsSync(package_path)){
         const package_json = JSON.parse(fs.readFileSync(package_path, 'utf8'));
         const term = base_name.split('/').pop();
-        obj.npm = {path:base_name, path_rel:term, version:package_json.version, package:package_json};
+        obj.npm = {path:base_name, rel_path:term, version:package_json.version, package:package_json};
     }
 }
 
@@ -111,7 +111,7 @@ const traverse_node = async (dep_path:string, obj:dependency) => {
 
     obj.lines = line_count;
     const statsObj = fs.statSync(dep_path);
-    obj.bytes = statsObj.size;
+    obj.size = statsObj.size;
     obj.last_mod = statsObj.mtime;
 
     // validate info for npm packages.
@@ -152,9 +152,9 @@ const create_dependency = (dep_path:string, type:string, stat:Stats, from_path:s
         const dep:dependency = {
             path: dep_path,
             type: type,
-            path_rel: short_path(dep_path),
+            rel_path: short_path(dep_path),
             uses: 0,
-            bytes: stat.size,
+            size: stat.size,
             deps: mixin.length > 0 ? mixin : [],
             from: from_path.length > 0 ? [from_path] : []
         };
