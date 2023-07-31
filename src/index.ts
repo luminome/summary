@@ -8,7 +8,7 @@
 // console.log('summary init...',__filename);
 
 import dependencyTree, { Tree } from 'dependency-tree';
-import fs from 'fs';
+import fs, {Stats} from 'fs';
 import path from 'path';
 import walk from 'walkdir';
 import { formatMs, timer, timer_model } from './util';
@@ -75,7 +75,8 @@ const validate_npm_module = (obj:dependency) => {
 
 const getAppRootDirFromPath = (p:string) => {
     //find enclosing with 'package.json';
-    const base = p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '');
+    // p.indexOf('.') !== -1 && 
+    const base = p.indexOf('.') !== -1 ? p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '') : p;
     let currentDir = base;
     while(!fs.existsSync(path.join(currentDir, 'package.json'))) {
         currentDir = path.join(currentDir, '..');
@@ -89,9 +90,15 @@ const getAppRootDirFromPath = (p:string) => {
 const traverse_node = async (dep_path:string, obj:dependency) => {
 
     // console.log('dep_path', `${dep_path}`, obj);
+    var line_count:number = await countFileLines(dep_path);
 
-    var line_count:number = await countFileLines(dep_path);;
+    // try {
+    //     line_count = await countFileLines(dep_path);
+    // } catch (err) {
+    //     console.error(err);
+    // }
 
+    // console.log(dep_path, line_count);
     // try {
     //     line_count = obj.type === 'directory' && await countFileLines(dep_path);
     // } catch (err) {
@@ -119,7 +126,7 @@ const traverse_node = async (dep_path:string, obj:dependency) => {
     const regex = /\/\*\*\n|\s\*\s|\*\s|\/\/.[a-z]+|\n\s\*\/|\n\*\//g;
 
     try {
-        if(!obj.validated){
+        if(!obj.validated && obj.path.indexOf('.json') === -1){
             const data = fs.readFileSync(dep_path, 'utf8');
             var m = data.match(/\/\*\*\s*\n([^\*]|\*[^\/])*\*\/\n/g);
             const summary = m && m.filter((e:string) => e.indexOf(config.summary_marker) !== -1)
@@ -133,7 +140,7 @@ const traverse_node = async (dep_path:string, obj:dependency) => {
 
 }
 
-const create_dependency = (dep_path:string, type:string, from_path:string = '', mixin:string[] = []):void => {
+const create_dependency = (dep_path:string, type:string, stat:Stats, from_path:string = '', mixin:string[] = []):void => {
 
     const obj = rm.get(dep_path);
 
@@ -147,6 +154,7 @@ const create_dependency = (dep_path:string, type:string, from_path:string = '', 
             type: type,
             path_rel: short_path(dep_path),
             uses: 0,
+            bytes: stat.size,
             deps: mixin.length > 0 ? mixin : [],
             from: from_path.length > 0 ? [from_path] : []
         };
@@ -173,12 +181,8 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
      */
     process_timer.start();
 
-
     base_path = getAppRootDirFromPath(target_path);
     console.log(log("Summary base_path"), base_path); 
-
-    // console.log('\x1b[44m\x1b[35mSummary base_path:\x1b[0m', base_path);
-
 
     Object.assign(config, configs);
     rm.clear();
@@ -203,14 +207,13 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
 
         const krel = Object.entries(list).map((a) => {
             return Object.keys(a[1]).map((dep_path:string) => {
-                create_dependency(dep_path, 'file', path);
+                create_dependency(dep_path, 'file', stat, path);
                 return dep_path;
             });
         });
 
         const node_type = stat.isFile() ? 'file' : 'directory';
-
-        create_dependency(path, node_type, '');
+        create_dependency(path, node_type, stat, '');
 
 
     });

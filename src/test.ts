@@ -7,7 +7,7 @@
 
 import summary from './index';
 
-summary('/Users/sac/Projects').then((res) => {
+summary('/Users/sac/Sites/gandi-sac-wp/static/a').then((res) => {
     // console.log(JSON.stringify(res, null, 2));
 });
 

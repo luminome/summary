@@ -1,0 +1,3 @@
+Error: ENFILE: file table overflow,
+
+sudo launchctl limit maxfiles 16384 16384 && ulimit -n 16384
