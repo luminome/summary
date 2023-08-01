@@ -2,6 +2,7 @@
 * utility ƒ
 * //summary
 */
+
 export function formatMs(ms:number, decimals:number = 3): string {
     if (!+ms) return '0 ms';
     const dm = decimals < 0 ? 0 : decimals
@@ -23,8 +24,6 @@ export function formatBytes(bytes:number, decimals:number = 2): string {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
-
-// export const baseUrl = 'https://api.example.com';
 
 export function keyGen(len:number = 6): string {
     return (Math.random() + 1).toString(36).substring(2,2+len).toUpperCase();
