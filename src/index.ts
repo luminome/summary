@@ -5,15 +5,12 @@
  * //summary
  */
 
-// console.log('summary init...',__filename);
-
 import dependencyTree, { Tree } from 'dependency-tree';
 import fs, {Stats} from 'fs';
 import path from 'path';
 import walk from 'walkdir';
 import { formatMs, timer, timer_model } from './util';
-
-import { colours } from './colors'
+import { colors } from './colors'
 import { countFileLines } from './file-io';
 
 export type dependency_npm = {
@@ -64,8 +61,6 @@ const compare = (a:any, b:any) => {
 
 
 const validate_npm_module = (obj:dependency) => {
-    // console.log('validate_npm_module', obj.path);
-
     const base_name = getAppRootDirFromPath(obj.path);
     const package_path = path.join(base_name, 'package.json');
     if(fs.existsSync(package_path)){
@@ -76,59 +71,26 @@ const validate_npm_module = (obj:dependency) => {
 }
 
 const getAppRootDirFromPath = (p:string) => {
-    //find enclosing with 'package.json';
-    // const statsObj = fs.statSync(p);
-    const base = p;//statsObj.isFile() ? p.replace(/\/?[^\/]+\.[a-z]+|\/$/g, '') : p;
-
-    // console.log(log(base));
-
-    let currentDir = base;
+    let currentDir = p;
     while(!fs.existsSync(path.join(currentDir, 'package.json'))) {
         currentDir = path.join(currentDir, '..');
-        // console.log(currentDir);
-        if(currentDir === '/') return base;
+        if(currentDir === '/') return p;
     }
     return currentDir
 }
 
 
-
 const traverse_node = async (dep_path:string, obj:dependency) => {
 
-    // console.log('dep_path', `${dep_path}`, obj);
     var line_count:number = await countFileLines(dep_path);
-
-    // try {
-    //     line_count = await countFileLines(dep_path);
-    // } catch (err) {
-    //     console.error(err);
-    // }
-
-    // console.log(dep_path, line_count);
-    // try {
-    //     line_count = obj.type === 'directory' && await countFileLines(dep_path);
-    // } catch (err) {
-    //     console.log('dep_path', `${dep_path}`);
-    //     console.error(err);
-    // }
-
-    // console.log(line_count);
-    // return false;
 
     obj.lines = line_count;
     const statsObj = fs.statSync(dep_path);
     obj.size = statsObj.size;
     obj.last_mod = statsObj.mtime;
 
-    // validate info for npm packages.
-    // console.log(obj.path);
     obj.path.indexOf('node_modules') !== -1 && validate_npm_module(obj);
 
-    
-    // obj.path_rel?.length > 0 && obj.path_rel.indexOf('node_modules') !== -1 && validate_npm_module(obj);
-    
-    // get summaries if they exist.
-    // this is some terrible regex.
     const regex = /\/\*\*\n|\s\*\s|\*\s|\/\/.[a-z]+|\n\s\*\/|\n\*\//g;
 
     try {
@@ -170,7 +132,6 @@ const create_dependency = (dep_path:string, type:string, stat:Stats, from_path:s
 }
 
 var filterFn = function(directory:string, files:string[]){
-    // console.log('directory', directory, files);
     return files.filter((name) => {
         var test = !config.omit.includes(name);
         const ext = name.split('.');
@@ -179,12 +140,10 @@ var filterFn = function(directory:string, files:string[]){
     });
 }
 
-const log = (msg:string) => `${colours.fg.magenta}${msg}${colours.reset}`;
+const log = (msg:string) => `${colors.fg.magenta}${msg}${colors.reset}`;
 
 const run_summary = async (target_path:string, configs:object = {}):Promise<object> => {
-    /**
-     * now we must locate the enclosing project directory.
-     */
+
     process_timer.start();
     Object.assign(config, configs);
 
@@ -192,12 +151,10 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
     console.log(log("Summary base_path"), base_path); 
     console.log(log("Config"), config); 
 
-    
-
     rm.clear();
     
     const walk_opts = {
-        "follow_symlinks": true,
+        "follow_symlinks": false,
         "filter" : filterFn
     }
 
@@ -245,165 +202,3 @@ const run_summary = async (target_path:string, configs:object = {}):Promise<obje
 
 export {run_summary as default};
 
-
-// default('./', null);
-
-
-
-// import { read, write } from './file-io';
-// import { keyGen } from './util';
-// import madge, { MadgeConfig } from 'madge';
-// import dotenv from 'dotenv';
-
-// dotenv.config();
-
-// const textual_marker = '--summary';
-
-// const no_ex:string[] = [];
-// // const madge_config:MadgeConfig = {
-// //     fileExtensions: ["ts", "js"], 
-// //     includeNpm: true,
-// //     // tsConfig: "./tsconfig.json",
-// //     // detectiveOptions: {
-// //     //     ts:{
-// //     //         mixedImports: true,
-// //     //         includeCore: true,
-// //     //         skipTypeImports: true
-// //     //     },
-// //     //     js:{
-// //     //         includeCore: true,
-// //     //     }
-// //     //     // includeCore: true,
-// //     //     // tsConfig: "./tsconfig.json",
-// //     //     // // "mixedImports": true,
-// //     //     // // "includeCore": true,
-// //     //     // // "nodeModulesConfig": {
-// //     //     // //     "entry": "module"
-// //     //     // // }, // optional
-// //     //     // nonExistent: no_ex,
-// // 	// },
-
-// // }
-
-// const madge_config:MadgeConfig = {
-//     "includeNpm": true,
-//     "detectiveOptions": {
-//         "ts": {
-//             "skipTypeImports": false
-//         }
-//     },
-//     "baseDir": "./",
-//     "fileExtensions": [
-//         "ts", "js"
-//     ],
-//     "tsConfig": "./tsconfig.json"
-// }
-
-// export type dependency = {
-//     path: string,
-//     uses: number,
-//     bytes: number,
-//     lines: number,
-//     last_mod: number,
-//     summary: string | string[]
-// }
-
-// // var flat:dependency[];
-// const flattened = new Map();
-
-// const check = (path:string):void => {
-//     const in_map = flattened.get(path);
-//     if(in_map === undefined){
-//         const k:dependency = {path:path, uses:1, bytes:0, lines:0, last_mod:0, summary: 'blank'};
-//         flattened.set(path, k);
-//     }else{
-//         in_map.uses ++;
-//     }
-// }
-
-// const filter = (src:any):void => {
-//     Object.keys(src).map((path:string) => {
-//         check(path);
-//         src[path].map((sub_path:string) =>{
-//             check(sub_path);
-//         })
-//     });
-// }
-
-// const read_summary = async (path:string): Promise<string> => {
-//     const map_el = flattened.get(path);
-//     const raw_read = await read(path);
-//     console.log(raw_read.message, raw_read.bytes_read, raw_read.num_lines);
-
-//     if(raw_read.payload){
-//         const has_summary = raw_read.payload.indexOf(`//${textual_marker}`);
-
-//         map_el.bytes = !map_el.bytes ? raw_read.bytes_read : 0;
-//         map_el.lines = !map_el.lines ? raw_read.num_lines+1 : 1;
-//         map_el.last_mod = !map_el.last_mod ? raw_read.stat : null;
-
-//         if(has_summary !== -1){
-//             let text:string = raw_read.payload.slice(0,has_summary);
-//             map_el.summary = text;
-//         }
-//     }
-
-//     return map_el.summary;
-// }
-
-// export const summary = async (path:string, save_json:string):Promise<object> => {
-
-//     console.log(madge_config);
-    
-
-//     const products = await madge(path, madge_config).then(res => {
-//         console.log('dep', res.depends('src/file-io.ts'));
-
-
-//         filter(res.obj());
-//         const results:Promise<string>[] = [];
-//         for(let [path, _] of flattened) results.push(read_summary(path));
-        
-//         const indices:Array<string> = [...flattened.keys()];
-
-//         Promise.all(results).then(r => {
-//             r.map((summary:string, i:number) => {
-//                 const map_el = flattened.get(indices[i]);
-//                 summary = summary.replace('/*\n','');
-//                 summary = summary.replace('\n*/\n','');
-//                 map_el.summary = summary.split('\n');
-//             });
-//             // console.log([...flattened]);
-//             // console.log([...flattened.values()]);
-//             save_json && write(
-//                 save_json, 
-//                 JSON.stringify([...flattened.values()], null, 2)
-//             );
-//             console.log('async part done');
-//         });
-        
-//         return {node_map: Object.fromEntries(flattened.entries()), node_structure:{obj:res.obj(), warnings:res.warnings()}};
-
-//     }).finally((r:void) => console.log('sync part done', r));
-
-//     return products;
-// }
-        
-
-
-
-// export default async (path:string | null, dom_obj:HTMLDivElement | null, save_json:string = ''):Promise<object> => {
-//     console.log(keyGen(), path, dom_obj, __filename);
-//     return path && summary(path, save_json);
-// }
-
-/**
-* This is the official version.
-* //summary
-*/
-
-/**
- * This is the un-official version.
- * //summary
- */
-//text
